@@ -6,10 +6,10 @@
 
 Method to deform an existing inaccurate building outline into a roofprint and a footprint coherent with each other and aligned on an ALS point cloud.
 
-<!-- --8<-- [end:introduction] -->
-
 The initial work was conducted as a Master thesis and can be found in [this archived repository](https://github.com/alexandre-bry/MSc_Thesis-Code).
 This older repository also links to the reports and slides produced during the thesis.
+
+<!-- --8<-- [end:introduction] -->
 
 ## TODO
 
