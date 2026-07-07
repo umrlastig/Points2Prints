@@ -1,0 +1,15 @@
+# Binaries, cache, build, log
+.venv/
+.cache/
+.temp/
+.tmp/
+build/
+__pycache__/
+**/roofer.log.json
+
+# Data
+data/*
+!data/validation
+data/validation/*
+!data/validation/validation-roofprints.parquet
+!data/validation/validation-footprints.parquet
