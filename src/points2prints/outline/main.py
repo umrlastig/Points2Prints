@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, List
 
 import typer
 
@@ -181,6 +181,47 @@ def crop_intersections_command(
         output_edges_file=output_edges_file,
         output_intersections_file=output_intersections_file,
         output_building_groups_file=output_groups_file,
+        input_output=InputOutput.from_flags(overwrite, skip_existing),
+        verbose=Verbose.from_int(verbose_int),
+    )
+
+
+def merge_polygons_command(
+    input_files: Annotated[
+        List[Path],
+        typer.Argument(
+            help="Path to the polygon datasets to merge.",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+        ),
+    ],
+    output_file: Annotated[
+        Path,
+        typer.Argument(help="Path where the merged polygon dataset will be written."),
+    ],
+    overwrite: Annotated[
+        bool,
+        typer.Option(
+            "--overwrite",
+            help="Whether to overwrite the output files.",
+        ),
+    ] = False,
+    skip_existing: Annotated[
+        bool,
+        typer.Option(
+            "--skip-existing",
+            help="Whether to skip steps if output files already exist.",
+        ),
+    ] = False,
+    verbose_int: Annotated[int, typer.Option("--verbose", "-v", count=True)] = 0,
+):
+    from .merge_polygons import merge_polygons_call
+
+    merge_polygons_call(
+        input_files=input_files,
+        output_file=output_file,
         input_output=InputOutput.from_flags(overwrite, skip_existing),
         verbose=Verbose.from_int(verbose_int),
     )

@@ -236,12 +236,12 @@ def compute_metrics_command(
             help="Path to the BD TOPO polygon dataset to compare.",
         ),
     ],
-    tiles_dirs: Annotated[
+    polygons_dirs: Annotated[
         List[Path],
         typer.Option(
-            "-t",
-            "--tiles-dir",
-            help="List of tile directories containing the pipeline output to compare.",
+            "-p",
+            "--polygons-dir",
+            help="List of tile directories containing the polygons to compare.",
         ),
     ],
     output_comparison_dir: Annotated[
@@ -315,7 +315,7 @@ def compute_metrics_command(
         validation_dataset_indiv_file=validation_dataset_indiv_path,
         validation_dataset_aggreg_file=validation_dataset_aggreg_path,
         bd_topo_file=bd_topo_path,
-        tiles_dirs=tiles_dirs,
+        polygons_dirs=polygons_dirs,
         output_comparison_dir=output_comparison_dir,
         output_format=output_format,
         id_column=id_column,

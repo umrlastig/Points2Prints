@@ -1,14 +1,16 @@
 import logging
+from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from multiprocessing import Pool
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from tqdm import tqdm
 
 from ..outline import (
     crop_intersections_implementation,
+    merge_polygons_implementation,
 )
 from ..point_cloud import (
     classification_mapping_implementation,
@@ -29,7 +31,7 @@ from ..utils import (
 def _build_cpp_tool():
     """Builds the C++ program to be able to use it in the rest of the pipeline."""
     logging.info(f"Building the C++ tools...")
-    command_build = ["pixi", "run", "--quiet", "cpp-build"]
+    command_build = ["pixi", "run", "--quiet", "p2p-cpp-build"]
     return_code = run_command_with_tqdm_logging(command_build)
     if return_code != 0:
         logging.error("C++ build failed.")
@@ -76,7 +78,7 @@ def _compute_inward_direction(
     command_inwards = [
         "pixi",
         "run",
-        "cpp-run-only",
+        "p2p-cpp-run-only",
         "inward_directions",
         "-i",
         str(input_las_path),
@@ -414,7 +416,7 @@ def _compute_distances_and_edges(
         "pixi",
         "run",
         "--quiet",
-        "cpp-run-only",
+        "p2p-cpp-run-only",
         "roof_edge_points",
         "-i",
         str(laz_file),
@@ -644,7 +646,7 @@ def _compute_roofprints(
         "pixi",
         "run",
         "--quiet",
-        "cpp-run-only",
+        "p2p-cpp-run-only",
         "roofprints",
         "-l",
         str(merged_edges_file),
@@ -752,7 +754,7 @@ def _compute_footprints(
         "pixi",
         "run",
         "--quiet",
-        "cpp-run-only",
+        "p2p-cpp-run-only",
         "footprints",
         "-p",
         str(lidar_hd_file),
@@ -1093,7 +1095,7 @@ def compute_metrics_implementation(
     validation_dataset_indiv_file: Path,
     validation_dataset_aggreg_file: Path,
     bd_topo_file: Path,
-    tiles_dirs: List[Path],
+    polygons_dirs: List[Path],
     output_comparison_dir: Path,
     output_format: str,
     id_column: str,
@@ -1112,8 +1114,8 @@ def compute_metrics_implementation(
         Path to the aggregated building validation dataset (Parquet file).
     bd_topo_file: Path
         Path to the BD TOPO polygon dataset to compare.
-    tiles_dirs: List[Path]
-        List of tile directories containing the pipeline output to compare.
+    polygons_dirs: List[Path]
+        List of tile directories containing the polygons to compare.
     output_comparison_dir: Path
         Directory where the comparison results will be saved.
     output_format: str
@@ -1156,27 +1158,42 @@ def compute_metrics_implementation(
         ]
     ] = []
 
-    scored_files: List[Path] = [bd_topo_file]
-    output_indiv_files: List[Path] = [
-        output_comparison_dir / f"bd_topo-indiv.{output_format}"
-    ]
-    output_aggreg_files: List[Path] = [
-        output_comparison_dir / f"bd_topo-aggreg.{output_format}"
-    ]
+    # Gather the polygons by file name
+    files_by_name: Dict[str, List[Path]] = defaultdict(list)
+    for polygon_dir in polygons_dirs:
+        for polygons_file in polygon_dir.glob("*.parquet"):
+            files_by_name[polygons_file.stem].append(polygons_file)
+    files_by_name["bd_topo"] = [bd_topo_file]
 
-    for tile_dir in tiles_dirs:
-        tile_name = tile_dir.name
-        for roofprints_file in (tile_dir / "roofprints").glob("*.parquet"):
-            roofprint_name = roofprints_file.stem
-            scored_files.append(roofprints_file)
-            output_indiv_files.append(
-                output_comparison_dir
-                / f"{tile_name}-{roofprint_name}-indiv.{output_format}"
+    # Merge the polygons by file name
+    scored_files: List[Path] = []
+    output_indiv_files: List[Path] = []
+    output_aggreg_files: List[Path] = []
+    for polygons_file_name, polygons_files in files_by_name.items():
+        scored_file = (
+            output_comparison_dir / "polygons" / f"{polygons_file_name}.parquet"
+        )
+        if len(polygons_files) > 1:
+            merge_polygons_implementation(
+                input_files=polygons_files,
+                output_file=scored_file,
+                input_output=input_output,
             )
-            output_aggreg_files.append(
-                output_comparison_dir
-                / f"{tile_name}-{roofprint_name}-aggreg.{output_format}"
-            )
+        else:
+            polygons_files[0].copy(scored_file)
+        scored_files.append(scored_file)
+        output_indiv_files.append(
+            output_comparison_dir
+            / "results"
+            / "indiv"
+            / f"{polygons_file_name}.{output_format}"
+        )
+        output_aggreg_files.append(
+            output_comparison_dir
+            / "results"
+            / "aggreg"
+            / f"{polygons_file_name}.{output_format}"
+        )
 
     input_output.handle_input(
         message_prefix=message_prefix,
@@ -1249,7 +1266,7 @@ def compute_metrics_call(
     validation_dataset_indiv_file: Path,
     validation_dataset_aggreg_file: Path,
     bd_topo_file: Path,
-    tiles_dirs: List[Path],
+    polygons_dirs: List[Path],
     output_comparison_dir: Path,
     output_format: str,
     id_column: str,
@@ -1269,8 +1286,8 @@ def compute_metrics_call(
         Path to the aggregated building validation dataset (Parquet file).
     bd_topo_file: Path
         Path to the BD TOPO polygon dataset to compare.
-    tiles_dirs: List[Path]
-        List of tile directories containing the pipeline output to compare.
+    polygons_dirs: List[Path]
+        List of tile directories containing the polygons to compare.
     output_comparison_dir: Path
         Directory where the comparison results will be saved.
     output_format: str
@@ -1294,7 +1311,7 @@ def compute_metrics_call(
             validation_dataset_indiv_file=validation_dataset_indiv_file,
             validation_dataset_aggreg_file=validation_dataset_aggreg_file,
             bd_topo_file=bd_topo_file,
-            tiles_dirs=tiles_dirs,
+            polygons_dirs=polygons_dirs,
             output_comparison_dir=output_comparison_dir,
             output_format=output_format,
             id_column=id_column,
