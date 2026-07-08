@@ -16,6 +16,5 @@
         "aaron-bond.better-comments",
         "stackbreak.comment-divider",
         "llvm-vs-code-extensions.vscode-clangd",
-        "nefrob.vscode-just-syntax"
     ]
 }
