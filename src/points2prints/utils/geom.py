@@ -1,6 +1,8 @@
-from typing import List
+from pathlib import Path
+from typing import Iterable, List
 
-from pyproj import Transformer
+import geopandas as gpd
+from pyproj import CRS, Transformer
 
 
 class Point2154:
@@ -61,3 +63,39 @@ class Box2154:
 
     def __str__(self) -> str:
         return f"Box2154(p_min=({self.p_min.x}, {self.p_min.y}), p_max=({self.p_max.x}, {self.p_max.y}))"
+
+
+def read_polygon_dataset(
+    input_file: Path, columns: Iterable[str] | None = None
+) -> gpd.GeoDataFrame:
+    suffix = input_file.suffix.lower()
+    if suffix == ".parquet":
+        return gpd.read_parquet(input_file, columns=columns)
+    elif suffix in {".gpkg", ".geojson", ".json", ".shp"}:
+        columns_list = list(columns) if columns else None
+        return gpd.read_file(input_file, columns=columns_list)
+    else:
+        raise ValueError(
+            f"Unsupported polygon dataset format for {input_file}. Expected .parquet or .gpkg."
+        )
+
+
+def write_polygon_dataset(
+    dataset: gpd.GeoDataFrame, output_file: Path, crs: CRS | None
+) -> None:
+    suffix = output_file.suffix.lower()
+    if crs is not None:
+        dataset.geometry.set_crs(crs, inplace=True)
+    if suffix == ".parquet":
+        dataset.to_parquet(
+            output_file,
+            index=False,
+            write_covering_bbox=True,
+            schema_version="1.1.0",
+        )
+    elif suffix in {".gpkg", ".geojson", ".json", ".shp"}:
+        dataset.to_file(output_file, index=False)
+    else:
+        raise ValueError(
+            f"Unsupported polygon dataset format for {output_file}. Expected .parquet or .gpkg."
+        )

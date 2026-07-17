@@ -95,6 +95,8 @@ As you can see we use the `data/input/bd_topo` folder for the raw BD TOPO data, 
 To run the full pipeline for a given tile, we have a Python script that bundles all the necessary steps.
 The final steps of the pipeline require [`roofer`](https://github.com/3DBAG/roofer) and [`cjseq`](https://github.com/cityjson/cjseq) to be installed.
 
+Moreover, the code from `LiDARHD_Traj_Estimation` must have been compiled before running this command, according to its specific README.
+
 ```bash
 # General command:
 pixi run p2p-py pipeline points_to_prints \

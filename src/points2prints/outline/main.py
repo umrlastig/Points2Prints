@@ -1,4 +1,3 @@
-import logging
 from pathlib import Path
 from typing import Annotated, List
 
@@ -222,6 +221,68 @@ def merge_polygons_command(
     merge_polygons_call(
         input_files=input_files,
         output_file=output_file,
+        input_output=InputOutput.from_flags(overwrite, skip_existing),
+        verbose=Verbose.from_int(verbose_int),
+    )
+
+
+@app.command("align_centroids")
+def align_centroids_command(
+    input_file: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to the input polygon dataset (polygons to shift).",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+        ),
+    ],
+    reference_file: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to the reference polygon dataset (polygons with the correct centroids).",
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+        ),
+    ],
+    output_file: Annotated[
+        Path,
+        typer.Argument(help="Path where the aligned polygon dataset will be written."),
+    ],
+    key: Annotated[
+        str,
+        typer.Option(
+            "--key",
+            "-k",
+            help="The key to identify and match polygons in the input and reference datasets.",
+        ),
+    ] = "cleabs",
+    overwrite: Annotated[
+        bool,
+        typer.Option(
+            "--overwrite",
+            help="Whether to overwrite the output files.",
+        ),
+    ] = False,
+    skip_existing: Annotated[
+        bool,
+        typer.Option(
+            "--skip-existing",
+            help="Whether to skip steps if output files already exist.",
+        ),
+    ] = False,
+    verbose_int: Annotated[int, typer.Option("--verbose", "-v", count=True)] = 0,
+):
+    from .centroid import align_centroids_call
+
+    align_centroids_call(
+        input_file=input_file,
+        reference_file=reference_file,
+        output_file=output_file,
+        key=key,
         input_output=InputOutput.from_flags(overwrite, skip_existing),
         verbose=Verbose.from_int(verbose_int),
     )

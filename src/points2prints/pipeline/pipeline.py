@@ -1173,6 +1173,7 @@ def compute_metrics_implementation(
         scored_file = (
             output_comparison_dir / "polygons" / f"{polygons_file_name}.parquet"
         )
+
         if len(polygons_files) > 1:
             merge_polygons_implementation(
                 input_files=polygons_files,

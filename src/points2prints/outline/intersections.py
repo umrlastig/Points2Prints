@@ -308,6 +308,22 @@ def intersections_implementation(
     output_building_groups_file: Path,
     input_output: InputOutput,
 ):
+    """
+    Compute the intersections between edges in the BD TOPO file and export the edges and intersections to Parquet files.
+
+    Parameters
+    ----------
+    bd_topo_file : Path
+        Input BD TOPO file (Parquet) containing the building geometries.
+    output_edges_file : Path
+        Output Parquet file where the edges will be saved.
+    output_intersections_file : Path
+        Output Parquet file where the intersections will be saved.
+    output_building_groups_file : Path
+        Output Parquet file where the building groups will be saved.
+    input_output: InputOutput
+        The handler for input and output file issues.
+    """
     message_prefix = f"Computing intersections for BD TOPO file '{bd_topo_file.name}'"
     input_output.handle_input(
         message_prefix=message_prefix,
@@ -345,7 +361,8 @@ def intersections_call(
     input_output: InputOutput,
     verbose: Verbose,
 ):
-    """_summary_
+    """
+    Call wrapper for :func:`intersections_implementation`.
 
     Parameters
     ----------
