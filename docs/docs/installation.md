@@ -14,6 +14,11 @@ icon: lucide/download
     ```bash
     pixi install
     ```
-3. Then there are a few other dependencies to install manually:
-    - You need to clone [LiDARHD_Traj_Estimation](https://github.com/whuwuteng/LiDARHD_Traj_Estimation) at the root of the project (not public yet)
-    - You also need to install [`roofer`](https://github.com/3DBAG/roofer) (documentation [there](https://innovation.3dbag.nl/roofer/getting_started.html)) and the [binary of `cjseq`](https://github.com/cityjson/cjseq).
+3. Clone and compile [LiDARHD_Traj_Estimation](https://github.com/whuwuteng/LiDARHD_Traj_Estimation) at the root of the project (not public yet):
+    ```bash
+    cd Points2Prints
+    git clone <git_path>
+    cd LiDARHD_Traj_Estimation/
+    pixi run build
+    ```
+4. Optionally, you may need to install [`roofer`](https://github.com/3DBAG/roofer) (documentation [there](https://innovation.3dbag.nl/roofer/getting_started.html)) and the [binary of `cjseq`](https://github.com/cityjson/cjseq).

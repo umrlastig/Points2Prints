@@ -189,7 +189,7 @@ pixi run p2p-py pipeline download_lidar_hd \
     --bbox "656000,6861000,657000,6862000" \
     --tiles-dir "data/tiles" \
     -vv
-curl https://data.geopf.fr/telechargement/download/BDTOPO/BDTOPO_3-5_TOUSTHEMES_GPKG_LAMB93_R11_2026-03-15/BDTOPO_3-5_TOUSTHEMES_GPKG_LAMB93_R11_2026-03-15.7z --output data/input/bd_topo/BDTOPO_3-5_TOUSTHEMES_GPKG_LAMB93_R11_2026-03-15.7z
+curl https://data.geopf.fr/telechargement/download/BDTOPO/BDTOPO_3-5_TOUSTHEMES_GPKG_LAMB93_R11_2026-03-15/BDTOPO_3-5_TOUSTHEMES_GPKG_LAMB93_R11_2026-03-15.7z --output data/input/bd_topo/BDTOPO_3-5_TOUSTHEMES_GPKG_LAMB93_R11_2026-03-15.7z --create-dirs
 7z x data/input/bd_topo/BDTOPO_3-5_TOUSTHEMES_GPKG_LAMB93_R11_2026-03-15.7z -odata/input/bd_topo/
 pixi run p2p-py pipeline prepare_bd_topo \
     -s data/input/bd_topo/BDTOPO_3-5_TOUSTHEMES_GPKG_LAMB93_R11_2026-03-15/BDTOPO/1_DONNEES_LIVRAISON_2026-03-00147/BDT_3-5_GPKG_LAMB93_R11_ED2026-03-15/BDT_3-5_GPKG_LAMB93_R11-ED2026-03-15.gpkg \
@@ -198,14 +198,17 @@ pixi run p2p-py pipeline prepare_bd_topo \
 pixi run p2p-py pipeline points_to_prints \
     -b data/formatted/bd_topo/R11-2026_03_15/ \
     -t data/tiles/676_6851/ \
+    --stop-after-roofprints \
     -vv
 pixi run p2p-py pipeline points_to_prints \
     -b data/formatted/bd_topo/R11-2026_03_15/ \
     -t data/tiles/676_6852/ \
+    --stop-after-roofprints \
     -vv
 pixi run p2p-py pipeline points_to_prints \
     -b data/formatted/bd_topo/R11-2026_03_15/ \
     -t data/tiles/656_6861/ \
+    --stop-after-roofprints \
     -vv
 pixi run p2p-py validation prepare_validation_dataset \
     data/validation/validation-roofprints.parquet \
