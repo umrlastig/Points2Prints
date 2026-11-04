@@ -8,10 +8,7 @@ from typing import Dict, List, Optional, Tuple
 
 from tqdm import tqdm
 
-from ..outline import (
-    crop_intersections_implementation,
-    merge_polygons_implementation,
-)
+from ..outline import crop_intersections_implementation, merge_polygons_implementation
 from ..point_cloud import (
     classification_mapping_implementation,
     merge_files,
@@ -1174,14 +1171,11 @@ def compute_metrics_implementation(
             output_comparison_dir / "polygons" / f"{polygons_file_name}.parquet"
         )
 
-        if len(polygons_files) > 1:
-            merge_polygons_implementation(
-                input_files=polygons_files,
-                output_file=scored_file,
-                input_output=input_output,
-            )
-        else:
-            polygons_files[0].copy(scored_file)
+        merge_polygons_implementation(
+            input_files=polygons_files,
+            output_file=scored_file,
+            input_output=input_output,
+        )
         scored_files.append(scored_file)
         output_indiv_files.append(
             output_comparison_dir

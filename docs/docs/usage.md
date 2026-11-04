@@ -215,13 +215,15 @@ pixi run p2p-py validation prepare_validation_dataset \
     data/validation/validation-roofprints-individual.parquet \
     data/validation/validation-roofprints-aggregated.parquet \
     -k custom_category \
+    --id-column cleabs \
     -vv
+pixi run p2p-py pipeline metrics \
     -i data/validation/validation-roofprints-individual.parquet \
     -a data/validation/validation-roofprints-aggregated.parquet \
     -b data/formatted/bd_topo/R11-2026_03_15/bd_topo.parquet \
-    -t data/tiles/676_6851/ \
-    -t data/tiles/676_6852/ \
-    -t data/tiles/656_6861/ \
+    -p data/tiles/676_6851/roofprints/ \
+    -p data/tiles/676_6852/roofprints/ \
+    -p data/tiles/656_6861/roofprints/ \
     -o data/validation/results/ \
     --output-format parquet \
     --id-column cleabs \

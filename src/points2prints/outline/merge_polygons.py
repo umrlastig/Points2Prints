@@ -32,6 +32,9 @@ def merge_polygons_implementation(
     if output_action == OutputActionEnum.SKIP:
         return
 
+    if len(input_files) > 1:
+        input_files[0].copy(output_file)
+
     input_polygons = [read_polygon_dataset(input_file) for input_file in input_files]
 
     # Check if all files have the same CRS
