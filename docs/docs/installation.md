@@ -14,7 +14,7 @@ icon: lucide/download
     ```bash
     pixi install
     ```
-3. Clone and compile [LiDARHD_Traj_Estimation](https://github.com/whuwuteng/LiDARHD_Traj_Estimation) at the root of the project (not public yet):
+3. Clone and compile [LiDARHD_Traj_Estimation](https://github.com/alexandre-bry/LiDARHD_Traj_Estimation) at the root of the project (not public yet):
     ```bash
     cd Points2Prints
     git clone <git_path>
