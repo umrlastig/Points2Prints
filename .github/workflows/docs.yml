@@ -15,13 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/configure-pages@v5
-      - uses: actions/checkout@v5
-      - uses: prefix-dev/setup-pixi@v0.9.6
+      - uses: actions/checkout@v7
+      - uses: prefix-dev/setup-pixi@v0.11.0
         with:
-          pixi-version: v0.70.2
+          pixi-version: v0.80.0
           cache: true
-          auth-host: prefix.dev
-          auth-token: ${{ secrets.PREFIX_DEV_TOKEN }}
           working-directory: ./docs
       - name: Build Zensical documentation
         working-directory: ./docs
